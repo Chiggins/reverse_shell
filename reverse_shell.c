@@ -99,8 +99,34 @@ void ssl_disconnect(connection *c) {
 }
 
 char *ssl_read(connection *c) {
+    const int readSize = 1024;
     char *rc = NULL;
-    // Do I really need to implement this??
+    int received, count = 0;
+    char buffer[1024];
+
+    if (c) {
+        while (1) {
+            if (!rc) {
+                rc = malloc(readSize * sizeof(char) + 1);
+            } else {
+                rc = realloc(rc, (count +1) * readSize * sizeof(char) + 1);
+            }
+
+            received = SSL_read(c->sslHandle, buffer, readSize);
+            buffer[received] = '\0';
+
+            if (received > 0) {
+                strcat(rc, buffer);
+            }
+
+            if (received < readSize) {
+                break;
+            }
+
+            count++;
+        }
+    }
+
     return rc;
 }
 
