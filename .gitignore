@@ -33,3 +33,6 @@ reverse_shell
 
 # Debug files
 *.dSYM/
+
+# VIM swp files
+*.swp
