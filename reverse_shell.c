@@ -62,24 +62,24 @@ connection *ssl_connect(char host[], int port) {
 
         c->sslContext = SSL_CTX_new(SSLv23_client_method());
         if (c->sslContext == NULL) {
-            return 1;
+            return NULL;
         }
 
         c->sslHandle = SSL_new(c->sslContext);
         if (c->sslHandle == NULL) {
-            return 1;
+            return NULL;
         }
 
         if (!SSL_set_fd(c->sslHandle, c->socket)) {
-            return 1;
+            return NULL;
         }
 
         if (SSL_connect(c->sslHandle) != 1) {
-            return 1;
+            return NULL;
         }
     } else {
         printf("SSL CONNECT MESSED UP");
-        return 1;
+        return NULL;
     }
     return c;
 }
@@ -99,7 +99,6 @@ void ssl_disconnect(connection *c) {
 }
 
 char *ssl_read(connection *c) {
-    const int readSize = 1024;
     char *rc = NULL;
     // Do I really need to implement this??
     return rc;
